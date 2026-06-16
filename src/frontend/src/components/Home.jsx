@@ -1,18 +1,42 @@
 import React, { useEffect, useState } from "react";
 import axiosClient from "../api/axiosclient";
 
+// Hàm tính toán mảng phân trang thông minh (có dấu 3 chấm)
+const getPagination = (currentPage, totalPages) => {
+    // Nếu tổng số trang ít (từ 5 trang trở xuống), hiển thị tất cả
+    if (totalPages <= 5) {
+        return Array.from({ length: totalPages }, (_, i) => i);
+    }
+
+    // Nếu đang ở 3 trang đầu
+    if (currentPage <= 2) {
+        return [0, 1, 2, 3, "...", totalPages - 1];
+    }
+
+    // Nếu đang ở 3 trang cuối
+    if (currentPage >= totalPages - 3) {
+        return [0, "...", totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1];
+    }
+
+    // Nếu đang ở đoạn giữa
+    return [0, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages - 1];
+};
+
 export default function Home() {
     // 1. CÁC BIẾN TRẠNG THÁI (STATE)
     // Nơi lưu trữ bộ nhớ ngắn hạn của màn hình. Bất cứ khi nào State thay đổi, React sẽ tự động vẽ lại (re-render) màn hình.
     const [messages, setMessage] = useState([]); // Lưu mảng dữ liệu lấy từ Java. Khởi tạo là mảng rỗng [].
     const [inputValue, setInputValue] = useState(""); // Lưu trữ giá trị hiện tại mà người dùng đang gõ trong ô input.
     const [editId, setEditId] = useState(null); // Lưu ID (vị trí) của tin nhắn đang được bấm "Edit". Nếu là null nghĩa là đang ở chế độ Thêm mới.
+    const [page, setPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
 
     // 2. GỌI API LẤY DỮ LIỆU (READ - GET)
     const getchMesssage = () => {
-        axiosClient.get('/api/messages')
+        axiosClient.get(`/api/messages?page=${page}&size=5`)
             .then((response) => {
                 setMessage(response.message) // Lấy mảng tin nhắn mới nhất đắp vào biến 'messages' để React vẽ lên giao diện.
+                setTotalPages(response.totalPages);
             })
             .catch((error) => { console.log(error) })
     }
@@ -21,7 +45,7 @@ export default function Home() {
     const createMessage = () => {
         axiosClient.post('/api/messages', { home: inputValue }) // Gói cái chữ đang gõ trong ô input thành cục JSON gửi đi
             .then(response => {
-                setMessage(response.message); // Cập nhật lại danh sách hiển thị với mảng mới
+                setMessage(prevMessage => [...prevMessage, response]); // Cập nhật lại danh sách hiển thị với mảng mới
                 setInputValue(""); // Xóa trắng ô input để người dùng nhập câu tiếp theo
             })
             .catch((error) => { console.log(error) })
@@ -32,7 +56,7 @@ export default function Home() {
         // Gắn 'editId' lên đuôi URL để báo cho Java biết mình muốn sửa dòng nào
         axiosClient.put(`/api/messages/${editId}`, { home: inputValue })
             .then(response => {
-                setMessage(response.message); // Cập nhật lại danh sách
+                setMessage(prevMessage => prevMessage.map((value, index) => index === editId ? response : value)); // Cập nhật lại danh) sách
                 setInputValue(""); // Xóa trắng ô input
                 setEditId(null);   // Đặt lại editId về null để hệ thống tự quay về chế độ "Thêm mới" ban đầu
             })
@@ -46,7 +70,7 @@ export default function Home() {
         // Nhấn nút xóa ở dòng nào thì truyền ID của dòng đó xuống đây để đính kèm lên URL
         axiosClient.delete(`/api/messages/${id}`)
             .then(response => {
-                setMessage(response.message) // Lấy mảng mới (đã bị xóa mất 1 dòng) đắp lên lại màn hình
+                setMessage(findIndex => findIndex.filter((_, index) => index !== id)) // Lấy mảng mới (đã bị xóa mất 1 dòng) đắp lên lại màn hình
             })
             .catch(error => {
                 console.log(error)
@@ -59,67 +83,78 @@ export default function Home() {
         setInputValue(value) // Copy chữ của dòng cũ đắp ngược lên ô input để người ta tiện gõ sửa
     }
 
-    // 7. VÒNG ĐỜI COMPONENT (LÚC VỪA MỞ TRANG WEB)
-    // Dấu [] ở cuối nghĩa là: "Hàm useEffect này chỉ chạy đúng 1 lần duy nhất ngay khi trang web vừa load xong"
     useEffect(() => {
         getchMesssage(); // Vừa vào trang web là lập tức đòi Java trả dữ liệu về để hiển thị luôn
-    }, []);
+    }, [page]);
 
-    // 8. GIAO DIỆN NGƯỜI DÙNG (UI / HTML)
-    // Phần này quyết định những gì sẽ hiện lên màn hình. React sẽ tự động vẽ lại (re-render) phần này mỗi khi State thay đổi.
+    const pages = getPagination(page, totalPages);
+
     return (
         <div>
             <h1>Home</h1>
-            {/* --- 8.1 KHU VỰC HIỂN THỊ DANH SÁCH (READ & DELETE) --- */}
+
             <div>
                 <strong>Java trả về:</strong>
-                {/* Dùng hàm map() để lặp qua mảng messages. Cứ mỗi phần tử trong mảng sẽ được React "biến hình" thành 1 thẻ <p> */}
+
                 {messages.map((value, index) => (
-                    // React bắt buộc mỗi thẻ sinh ra từ vòng lặp phải có 1 cái 'key' duy nhất để nó theo dõi sự thay đổi
+
                     <p key={index}>
-                        {/* In nội dung của tin nhắn ra màn hình */}
+
                         {value}
 
-                        {/* Nút Sửa: Bấm vào thì gọi hàm handleEdit, truyền vị trí (index) và chữ hiện tại (value) vào ô input */}
+
                         <button onClick={() => handleEdit(index, value)}>Edit</button>
 
-                        {/* Nút Xóa: Bấm vào thì gọi thẳng hàm deleteMessage, truyền đúng cái index của dòng đó để báo cho Java xóa */}
+
                         <button onClick={() => deleteMessage(index)}>Delete</button>
                     </p>
                 ))}
             </div>
-            {/* --- 8.2 KHU VỰC FORM NHẬP LIỆU (CREATE & UPDATE) --- */}
-            {/* onSubmit={(e) => e.preventDefault()}: Lệnh kinh điển của React 
-            giúp chặn thói quen xấu của thẻ <form> là tự động reload trang web khi bấm nút Enter */}
+            <div className="pagination">
+                <button
+                    disabled={page === 0}
+                    onClick={() => setPage(page - 1)}
+                >
+                    Trang trước
+                </button>
+                {
+                    pages.map((item, index) => (
+                        item === "..." ?
+                            <span key={index}>...</span> :
+                            <button
+                                key={index}
+                                onClick={() => setPage(item)}
+                            >
+                                {item + 1}
+                            </button>
+                    ))
+                }
+                <button
+                    disabled={page >= totalPages - 1}
+                    onClick={() => setPage(page + 1)}
+                >
+                    Trang sau
+                </button>
+            </div>
+
+
             <form action="" onSubmit={(e) => e.preventDefault()}>
-                {/* 
-                    Ô Input "2 chiều": 
-                    - value={inputValue}: Trói chặt giá trị hiển thị trong ô với biến State 'inputValue'.
-                    - onChange: Mỗi khi người dùng gõ 1 phím, lập tức túm lấy chữ đó (e.target.value) nhét ngược lại vào State.
-                */}
+
                 <input type="text" onChange={(e) => setInputValue(e.target.value)} value={inputValue} />
-                {/* Toán tử 3 ngôi (Điều_kiện ? Nếu_Đúng_thì_in_cái_này : Nếu_Sai_thì_in_cái_kia) */}
-                {/* Kiểm tra xem hệ thống có đang cắm cờ Sửa (editId) ở dòng nào không? */}
+
                 {editId !== null ?
-
-                    /* TRƯỜNG HỢP ĐÚNG (Có editId): Có nghĩa là đang ở chế độ Sửa (Edit Mode) */
                     <div>
-                        {/* Bấm Cập nhật thì chạy hàm gọi API PUT */}
                         <button type="button" onClick={updateMessage}>Cap nhat du lieu</button>
-
-                        {/* Bấm Hủy thì nhổ cờ (editId = null) và xóa trắng ô input để giao diện tự quay về chế độ Thêm mới như cũ */}
                         <button type="button" onClick={() => {
                             setEditId(null);
                             setInputValue("")
                         }}>Huy</button>
                     </div>
                     :
-                    /* TRƯỜNG HỢP SAI (editId là null): Có nghĩa là đang ở chế độ Thêm mới bình thường (Create Mode) */
-                    /* Bấm Gửi thì chạy hàm gọi API POST */
                     <button type="button" onClick={createMessage}>Gửi dữ liệu</button>
                 }
             </form>
 
-        </div>
+        </div >
     );
 }
