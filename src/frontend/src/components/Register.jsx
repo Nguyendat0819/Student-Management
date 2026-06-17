@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axiosClient from "../api/axiosclient";
 import "../assets/form.css";
+import { useNavigate } from "react-router-dom";
 export default function Register() {
     const [userName, setUsername] = useState();
     const [password, setPassword] = useState();
@@ -9,7 +10,7 @@ export default function Register() {
     const [errorEmail, setErrorEmail] = useState();
     const [showPassword, setShowpassword] = useState(false);
     const [showRepassword, setShowrepassword] = useState(false);
-
+    const Navigate = useNavigate();
     useEffect(() => {
         if (errorEmail) {
             const timer = setTimeout(() => {
@@ -27,7 +28,11 @@ export default function Register() {
         }
         const dtoRegister = { userName, password, email };
         axiosClient.post('/api/register', dtoRegister)
-            .then((response) => console.log("Đăng ký thành công"))
+            .then((response) => {
+                console.log("Đăng ký thành công");
+                alert("Đăng ký thành công");
+                Navigate('/login');
+            })
             .catch((error) => {
                 setErrorEmail(error.response?.data || "Tài khoản đã tồn tại");
             });
@@ -36,29 +41,29 @@ export default function Register() {
         <div className="register-container">
             <form onSubmit={formRegister} className="register-form">
                 <h2 className="register-title">Đăng Ký Tài Khoản</h2>
-                
+
                 <div className="input-group">
                     <input type="text" className="register-input" name="userName" value={userName || ""} onChange={(e) => setUsername(e.target.value)} placeholder="Tên đăng nhập" required />
                 </div>
-                
+
                 <div className="input-group password-group">
                     <input type={showPassword ? "text" : "password"} className="register-input" name="password" value={password || ""} onChange={(e) => setPassword(e.target.value)} placeholder="Nhập mật khẩu" required />
                     <button type="button" className="toggle-password" onClick={() => setShowpassword(!showPassword)}>
                         {showPassword ? "👁️" : "👁️‍🗨️"}
                     </button>
                 </div>
-                
+
                 <div className="input-group password-group">
                     <input type={showRepassword ? "text" : "password"} className="register-input" name="repassword" value={repassword || ""} onChange={(e) => setRepassword(e.target.value)} placeholder="Nhập lại mật khẩu" required />
                     <button type="button" className="toggle-password" onClick={() => setShowrepassword(!showRepassword)}>
                         {showRepassword ? "👁️" : "👁️‍🗨️"}
                     </button>
                 </div>
-                
+
                 <div className="input-group">
                     <input type="email" name="email" className="register-input" value={email || ""} onChange={(e) => setEmail(e.target.value)} placeholder="Nhập email" required />
                 </div>
-                
+
                 {errorEmail &&
                     <div className="error-container">
                         <p className="register-error text-red-500">
@@ -66,7 +71,7 @@ export default function Register() {
                         </p>
                     </div>
                 }
-                
+
                 <button type="submit" className="register-submit">Đăng ký</button>
             </form>
         </div>
