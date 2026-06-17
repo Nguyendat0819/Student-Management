@@ -1,0 +1,145 @@
+/* Reset or basic setup for the container to take full height if needed */
+.register-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;
+}
+
+/* Glassmorphism Form Card with Entrance Animation */
+.register-form {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    max-width: 450px;
+    width: 100%;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transform: translateY(30px);
+    opacity: 0;
+}
+
+/* Title Styling */
+.register-title {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+/* Input Group Container */
+.input-group {
+    position: relative;
+    margin-bottom: 25px;
+}
+
+/* Input Fields */
+.register-input {
+    width: 100%;
+    padding: 15px 20px;
+    font-size: 16px;
+    border: 2px solid #e1e5ee;
+    border-radius: 12px;
+    outline: none;
+    transition: all 0.3s ease;
+    background-color: #f8fafc;
+    color: #333;
+    box-sizing: border-box; /* Ensures padding doesn't affect width */
+}
+
+/* Input Focus Animation */
+.register-input:focus {
+    border-color: #667eea;
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+/* Positioning the Eye Icon for Password Fields */
+.password-group .toggle-password {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 0;
+    color: #888;
+    transition: transform 0.2s ease;
+}
+
+.password-group .toggle-password:hover {
+    transform: translateY(-50%) scale(1.1);
+}
+
+/* Error Message Animation */
+.error-container {
+    margin-bottom: 20px;
+    animation: shake 0.4s ease-in-out;
+}
+
+.register-error {
+    color: #e53e3e;
+    font-size: 14px;
+    text-align: center;
+    margin: 0;
+    background-color: #fff5f5;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #feb2b2;
+}
+
+/* Submit Button Styling */
+.register-submit {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    margin-top: 10px;
+}
+
+/* Button Hover and Active Animations */
+.register-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.register-submit:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 10px rgba(102, 126, 234, 0.4);
+}
+
+/* --- KEYFRAMES FOR ANIMATIONS --- */
+
+/* Slide Up and Fade In for the form */
+@keyframes slideUpFade {
+    0% {
+        transform: translateY(40px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Shake animation for error message */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+}
