@@ -5,6 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.example.Dto.LoginDto;
 import com.example.Dto.RegisterDto;
 import com.example.student_grade.Model.User;
 import com.example.student_grade.Repository.*;
@@ -30,5 +31,16 @@ public class UserService {
 
         user.setEmail(dtoRegister.getEmail());
         userRepo.save(user);
+    }
+
+    public void Login(LoginDto dtoLogin) throws Exception {
+        LoginDto user = userRepo.findLoginData(dtoLogin.getEmail());
+        if (user == null) {
+            throw new Exception("Tai khoan khong ton tai");
+        }
+        if (!passwordEncoder.matches(dtoLogin.getPassword(), user.getPassword())) {
+            throw new Exception("Mat khau khong dung");
+        }
+
     }
 }
