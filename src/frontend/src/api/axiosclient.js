@@ -43,9 +43,13 @@ axiosClient.interceptors.response.use(
     },
     (Error) => {
         // Bắt lỗi toàn cục: Nếu Backend đuổi cổ không cho vào (Lỗi 401 Unauthorized)
-        if (Error.response && Error.response.status === 401) {
-            console.log('Token hết hạn hoặc bạn chưa đăng nhập!');
-            // Ở dự án thực tế, người ta thường code thêm lệnh chuyển hướng tự động văng về trang Đăng Nhập ở ngay dòng này.
+        if (Error.response && (Error.response.status === 401 || Error.response.status === 403)) {
+            // NẾU KHÔNG CÓ DÒNG IF NÀY: Khi nhập sai mật khẩu sẽ bị tải lại trang liên tục và mất dòng chữ báo lỗi màu đỏ!
+            if (Error.config.url !== '/api/login') {
+                localStorage.removeItem('token');
+                console.log('Token hết hạn hoặc bạn chưa đăng nhập!');
+                window.location.href = '/login'; // Chuyển hướng người dùng về trang Đăng Nhập
+            }
         }
         return Promise.reject(Error);
     }

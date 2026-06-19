@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axiosClient from "../api/axiosclient";
-
+import { useNavigate } from "react-router-dom";
 // Hàm tính toán mảng phân trang thông minh (có dấu 3 chấm)
 const getPagination = (currentPage, totalPages) => {
     // Nếu tổng số trang ít (từ 5 trang trở xuống), hiển thị tất cả
@@ -30,7 +30,7 @@ export default function Home() {
     const [editId, setEditId] = useState(null); // Lưu ID (vị trí) của tin nhắn đang được bấm "Edit". Nếu là null nghĩa là đang ở chế độ Thêm mới.
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
-
+    const navigate = useNavigate();
     // 2. GỌI API LẤY DỮ LIỆU (READ - GET)
     const getchMesssage = () => {
         axiosClient.get(`/api/messages?page=${page}&size=5`)
@@ -83,8 +83,19 @@ export default function Home() {
         setInputValue(value) // Copy chữ của dòng cũ đắp ngược lên ô input để người ta tiện gõ sửa
     }
 
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        navigate('/login');
+    }
+
     useEffect(() => {
-        getchMesssage(); // Vừa vào trang web là lập tức đòi Java trả dữ liệu về để hiển thị luôn
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert("Bạn chưa đăng nhập");
+            navigate('/login');
+        } else {
+            getchMesssage(); // Vừa vào trang web là lập tức đòi Java trả dữ liệu về để hiển thị luôn
+        }
     }, [page]);
 
     const pages = getPagination(page, totalPages);
@@ -92,7 +103,9 @@ export default function Home() {
     return (
         <div>
             <h1>Home</h1>
-
+            <div>
+                <button onClick={handleLogout}>Đăng xuất</button>
+            </div>
             <div>
                 <strong>Java trả về:</strong>
 

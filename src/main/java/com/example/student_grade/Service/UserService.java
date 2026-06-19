@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
-
+import org.springframework.security.authentication.BadCredentialsException;
 import com.example.Dto.LoginDto;
 import com.example.Dto.RegisterDto;
 import com.example.student_grade.Model.User;
@@ -33,14 +33,10 @@ public class UserService {
         userRepo.save(user);
     }
 
-    public void Login(LoginDto dtoLogin) throws Exception {
+    public void Login(LoginDto dtoLogin) {
         LoginDto user = userRepo.findLoginData(dtoLogin.getEmail());
-        if (user == null) {
-            throw new Exception("Tai khoan khong ton tai");
+        if (user == null || !passwordEncoder.matches(dtoLogin.getPassword(), user.getPassword()) ) {
+            throw new BadCredentialsException("Email hoặc mật khẩu không đúng");
         }
-        if (!passwordEncoder.matches(dtoLogin.getPassword(), user.getPassword())) {
-            throw new Exception("Mat khau khong dung");
-        }
-
     }
 }

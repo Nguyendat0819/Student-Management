@@ -22,7 +22,13 @@ export default function Login() {
         e.preventDefault();
         const dtoLogin = { email, password }
         axiosClient.post('/api/login', dtoLogin)
-            .then(() => {
+            .then((response) => {
+                // Bạn đã lấy data ra ở Interceptor, nên ở đây chỉ cần response.token
+                const token = response.token;
+                console.log(token);
+                if (token) {
+                    localStorage.setItem('token', token);
+                }
                 alert("Đăng nhập thành công");
                 navigate('/home');
             })
@@ -31,13 +37,11 @@ export default function Login() {
                 const errData = error.response?.data;
                 const message = typeof errData === 'string' ? errData.toLowerCase() : (errData?.message?.toLowerCase() || "");
 
-                // So khớp với chữ mà Java throw ra ("tai khoan khong ton tai", "mat khau khong dung")
-                if (message.includes("mat khau")) {
-                    setError("Sai mật khẩu");
-                } else if (message.includes("tai khoan")) {
-                    setError("Tài khoản không tồn tại");
+                // So khớp với chữ mà Java throw ra
+                if (message.includes("email") || message.includes("mật khẩu")) {
+                    setError("Email hoặc mật khẩu không đúng");
                 } else {
-                    setError("Lỗi không xác định");
+                    setError("Lỗi không xác định: " + (typeof errData === 'string' ? errData : ""));
                 }
             })
     }
