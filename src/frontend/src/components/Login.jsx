@@ -25,12 +25,22 @@ export default function Login() {
             .then((response) => {
                 // Bạn đã lấy data ra ở Interceptor, nên ở đây chỉ cần response.token
                 const token = response.token;
+                const role = response.role;
                 console.log(token);
-                if (token) {
+                console.log(role);
+                if (token && role) {
                     localStorage.setItem('token', token);
+                    localStorage.setItem('role', role);
                 }
                 alert("Đăng nhập thành công");
-                navigate('/home');
+                if (role === 'teacher') {
+                    navigate('/teacher-dashboard');
+                } else if (role == 'student') {
+                    navigate('/student-dashboard')
+                }
+                else {
+                    navigate('/home');
+                }
             })
             .catch((error) => {
                 // Lấy thông báo lỗi từ backend trả về (vd: "Tai khoan khong ton tai")

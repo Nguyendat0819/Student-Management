@@ -12,10 +12,13 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("""
                     SELECT new com.example.Dto.LoginDto(
                         u.email,
-                        u.password
+                        u.password,
+                        u.role
                     )
                     FROM User u
                     where u.email = :email
             """)
     com.example.Dto.LoginDto findLoginData(@Param("email") String email);
+
+    boolean existsByRole(String role);
 }

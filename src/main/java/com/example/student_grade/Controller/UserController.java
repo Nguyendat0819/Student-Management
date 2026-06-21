@@ -8,22 +8,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.Dto.JwtResponse;
 import com.example.Dto.LoginDto;
 import com.example.Dto.RegisterDto;
 import com.example.student_grade.Service.UserService;
-import com.example.student_grade.Util.JwtUtil;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 public class UserController {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private JwtUtil jwtUtil;
 
     @PostMapping("/api/register")
     public ResponseEntity<?> register(@RequestBody RegisterDto dtoRegister) {
@@ -40,16 +34,9 @@ public class UserController {
     @PostMapping("/api/login")
     public ResponseEntity<?> login(@RequestBody LoginDto dtoLogin) {
         try {
-            userService.Login(dtoLogin);
+            JwtResponse response = userService.Login(dtoLogin);
             System.out.println("Dang nhap thanh cong: " + dtoLogin.getEmail());
 
-            // tao JWT Token
-            String token = jwtUtil.generateToken(dtoLogin.getEmail());
-
-            // Tra ve token cho client
-            Map<String, String> response = new HashMap<>();
-            response.put("token", token);
-            response.put("message", "Login success");
             return ResponseEntity.ok(response);
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
