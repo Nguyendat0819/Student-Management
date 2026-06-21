@@ -8,6 +8,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Table(name = "user")
 @Getter
@@ -28,4 +30,7 @@ public class User {
 
     @Column(name = "role", length = 50)
     private String role;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Grades> grades;
 }
