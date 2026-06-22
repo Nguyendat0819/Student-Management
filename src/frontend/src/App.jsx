@@ -6,6 +6,7 @@ import ProtectedRoute from './layout/ProtectedRoute';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import TeacherDashboard from './components/TeacherDashboard';
 import StudentDashboard from './components/StudentDashboard';
+import TeacherGrades from './components/TeacherGrades';
 function App() {
   return (
     <Router>
@@ -19,6 +20,12 @@ function App() {
 
           <ProtectedRoute requiredRole={'teacher'}>
             <TeacherDashboard />
+          </ProtectedRoute>
+        }
+        />
+        <Route path='teacher-grades' element={
+          <ProtectedRoute requiredRole={'teacher'}>
+            <TeacherGrades />
           </ProtectedRoute>
         }
         />
