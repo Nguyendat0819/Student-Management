@@ -1,6 +1,8 @@
 package com.example.student_grade.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +27,7 @@ public class SubjectService {
         System.out.println("Nhap mon thanh cong");
     }
 
-    public List<Subject> getAllSubject() {
-        return subjectRepos.getAllSubject();
+    public Page<Subject> getAllSubject(Pageable pageable) {
+        return subjectRepos.findAll(pageable);
     }
 }

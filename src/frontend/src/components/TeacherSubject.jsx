@@ -18,12 +18,33 @@ export default function TeacherSubject() {
         }));
     };
 
+    const getPagination = (currentPage, totalPages) => {
+        if (totalPages <= 5) {
+            return Array.from({ length: totalPages }, (_, i) => i);
+        }
+
+        if (currentPage <= 2) {
+            return [0, 1, 2, "...", totalPages - 1];
+        }
+
+        if (currentPage >= totalPages - 3) {
+            return ["...", totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1];
+        }
+
+        return [0, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages - 1];
+    }
+    const pages = getPagination(page, totalPages);
     const formSubject = (e) => {
         e.preventDefault();
 
         axiosClient.post('/api/subject', data)
             .then((reponse) => {
-
+                alert("Đã thêm môn học thành công");
+                setData({
+                    subject_name: '',
+                    coefficient: ''
+                });
+                getSubject();
             })
             .catch((error) => {
                 const errData = error.response?.data;
@@ -38,9 +59,10 @@ export default function TeacherSubject() {
 
 
     const getSubject = () => {
-        axiosClient.get('/api/subject')
+        axiosClient.get(`/api/subject?page=${page}&size=5`)
             .then((reponse) => {
-                setSubjects(reponse);
+                setSubjects(reponse.content || []);
+                setTotalPages(reponse.totalPages || 0);
             })
             .catch((error) => {
 
@@ -56,7 +78,7 @@ export default function TeacherSubject() {
     }, [error]);
     useEffect(() => {
         getSubject();
-    }, []);
+    }, [page]);
     return (
         <div className="container-subject">
             <form action="" onSubmit={formSubject} className="form-subject">
@@ -68,10 +90,10 @@ export default function TeacherSubject() {
                     </div>
                 }
                 <div className="form-subject-name">
-                    <input type="text" name="subject_name" value={data.subject_name} onChange={handleChange} placeholder="Nhập tên môn học: " required />
+                    <input type="text" name="subject_name" value={data.subject_name} onChange={handleChange} placeholder="Nhập tên môn học: " autoComplete="off" required />
                 </div>
                 <div>
-                    <input type="text" name="coefficient" value={data.coefficient} onChange={handleChange} placeholder="Nhập hệ số môn: " required />
+                    <input type="text" name="coefficient" value={data.coefficient} onChange={handleChange} placeholder="Nhập hệ số môn: " autoComplete="off" required />
                 </div>
                 <button type="submit">Submit</button>
             </form>
@@ -102,6 +124,38 @@ export default function TeacherSubject() {
                         )}
                     </tbody>
                 </table>
+                {/* pagination */}
+                <div>
+                    <button
+                        onClick={() => setPage(prev => Math.max(0, prev - 1))}
+                        disabled={page === 0}
+                    >
+                        Trang trước
+                    </button>
+
+                    <span>{page + 1} / {totalPages === 0 ? 1 : totalPages}</span>
+                    <button
+                        onClick={() => setPage(prev => prev + 1)}
+                        disabled={page >= totalPages - 1}
+                    >
+                        Trang sau
+                    </button>
+                </div>
+                <div>
+                    {
+                        pages.map((item, index) => (item === "..." ?
+                            <span key={index}>...</span> :
+                            <button
+                                key={index}
+                                onClick={() => setPage(item)}
+                                style={item === page ? { backgroundColor: '#007bff', color: '#fff', fontWeight: 'bold' } : {}}
+                            >
+                                {item + 1}
+                            </button>
+
+                        ))
+                    }
+                </div>
             </div>
 
         </div>
