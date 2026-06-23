@@ -19,7 +19,7 @@ import lombok.Setter;
 public class Grades {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int Id;    
+    private int id;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

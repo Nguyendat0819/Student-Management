@@ -1,0 +1,31 @@
+package com.example.student_grade.Service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.stereotype.Service;
+
+import com.example.student_grade.Repository.SubjectRepository;
+import com.example.student_grade.Model.Subject;
+import java.util.List;
+
+@Service
+public class SubjectService {
+    @Autowired
+    private SubjectRepository subjectRepos;
+
+    public void addSubject(Subject data) throws Exception {
+        Subject subject = subjectRepos.findBySubject_name(data.getSubject_name());
+        if (subject != null) {
+            throw new IllegalArgumentException("Da co trong subject roi");
+        }
+        Subject newSubject = new Subject();
+        newSubject.setSubject_name(data.getSubject_name());
+        newSubject.setCoefficient(data.getCoefficient());
+        subjectRepos.save(newSubject);
+        System.out.println("Nhap mon thanh cong");
+    }
+
+    public List<Subject> getAllSubject() {
+        return subjectRepos.getAllSubject();
+    }
+}

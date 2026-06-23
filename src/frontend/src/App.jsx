@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import TeacherDashboard from './components/TeacherDashboard';
 import StudentDashboard from './components/StudentDashboard';
 import TeacherGrades from './components/TeacherGrades';
+import TeacherSubject from './components/TeacherSubject';
 function App() {
   return (
     <Router>
@@ -26,6 +27,12 @@ function App() {
         <Route path='teacher-grades' element={
           <ProtectedRoute requiredRole={'teacher'}>
             <TeacherGrades />
+          </ProtectedRoute>
+        }
+        />
+        <Route path='teacher-subject' element={
+          <ProtectedRoute requiredRole={'teacher'}>
+            <TeacherSubject />
           </ProtectedRoute>
         }
         />

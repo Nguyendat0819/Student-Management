@@ -13,7 +13,7 @@ import java.util.List;
 public class Subject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int Id;
+    private int id;
 
     @Column(name = "subject_name", nullable = false, length = 255)
     private String subject_name;
@@ -21,7 +21,8 @@ public class Subject {
     @Column(nullable = false, name = "coefficient", length = 255)
     private String coefficient;
 
-    @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private List<Grades> grades;
 
 }
