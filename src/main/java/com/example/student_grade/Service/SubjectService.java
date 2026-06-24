@@ -30,4 +30,24 @@ public class SubjectService {
     public Page<Subject> getAllSubject(Pageable pageable) {
         return subjectRepos.findAll(pageable);
     }
+
+    public Subject putSubject(Subject updateData) throws Exception {
+        Subject existingSubject = subjectRepos.findById(updateData.getId())
+                .orElseThrow(() -> {
+                    System.out.println("khong tim thay mon hoc");
+                    return new IllegalArgumentException("khong tim thay mon hoc");
+                });
+
+        if (!existingSubject.getSubject_name().equals(updateData.getSubject_name())) {
+            Subject duplicaSubject = subjectRepos.findBySubject_name(updateData.getSubject_name());
+            if (duplicaSubject != null) {
+                System.out.println("Ten mon hoc da ton tai");
+                throw new IllegalArgumentException("Tên môn học đã tồn tại");
+            }
+        }
+        existingSubject.setSubject_name(updateData.getSubject_name());
+        existingSubject.setCoefficient(updateData.getCoefficient());
+
+        return subjectRepos.save(existingSubject);
+    }
 }

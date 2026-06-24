@@ -11,7 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -52,6 +54,24 @@ public class SubjectController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Hệ thống đang gặp sự cố, vui lòng thử lại sau!");
+        }
+    }
+
+    @PutMapping("/api/subject/{id}")
+    public ResponseEntity<?> updateSubject(@PathVariable int id, @RequestBody Subject updateData) {
+        try {
+            updateData.setId(id);
+            subjectService.putSubject(updateData);
+            System.out.println("Cập nhật thành công môn học");
+            return ResponseEntity.ok("Sửa môn học thành công");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Lỗi chi tiết " + e.getMessage() + "(" + e.getClass().getSimpleName() + ")");
         }
     }
 }
