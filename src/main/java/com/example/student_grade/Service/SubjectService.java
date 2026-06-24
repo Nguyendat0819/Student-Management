@@ -27,7 +27,10 @@ public class SubjectService {
         System.out.println("Nhap mon thanh cong");
     }
 
-    public Page<Subject> getAllSubject(Pageable pageable) {
+    public Page<Subject> getAllSubject(Pageable pageable, String keyword) {
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            return subjectRepos.searchSubject(keyword.trim(), pageable);
+        }
         return subjectRepos.findAll(pageable);
     }
 

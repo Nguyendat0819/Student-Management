@@ -46,10 +46,11 @@ public class SubjectController {
     @GetMapping("/api/subject")
     public ResponseEntity<?> getAllSubject(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size) {
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(required = false) String keyword) {
         try {
             Pageable pageable = PageRequest.of(page, size);
-            Page<Subject> subjectsPage = subjectService.getAllSubject(pageable);
+            Page<Subject> subjectsPage = subjectService.getAllSubject(pageable, keyword);
             return ResponseEntity.ok(subjectsPage);
         } catch (Exception e) {
             e.printStackTrace();

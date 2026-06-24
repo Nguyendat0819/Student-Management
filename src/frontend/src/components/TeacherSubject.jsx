@@ -12,7 +12,8 @@ export default function TeacherSubject() {
         coefficient: ''
     });
     const [viewUpdate, setViewupdate] = useState(false);
-
+    const [searchTerm, setSearchTerm] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
     const getPagination = (currentPage, totalPages) => {
         if (totalPages <= 5) {
             return Array.from({ length: totalPages }, (_, i) => i);
@@ -72,7 +73,15 @@ export default function TeacherSubject() {
     }
 
     const getSubject = () => {
-        axiosClient.get(`/api/subject?page=${page}&size=5`)
+        const params = new URLSearchParams({
+            page: page,
+            size: 5
+        });
+
+        if (debouncedSearch) {
+            params.append('keyword', debouncedSearch);
+        }
+        axiosClient.get(`/api/subject?${params.toString()}`)
             .then((reponse) => {
                 setSubjects(reponse.content || []);
                 setTotalPages(reponse.totalPages || 0);
@@ -123,8 +132,17 @@ export default function TeacherSubject() {
     }, [error]);
 
     useEffect(() => {
+        const handler = setTimeout(() => {
+            if (debouncedSearch !== searchTerm) {
+                setDebouncedSearch(searchTerm);
+                setPage(0);
+            }
+        }, 500);
+        return () => clearTimeout(handler);
+    }, [searchTerm]);
+    useEffect(() => {
         getSubject();
-    }, [page]);
+    }, [page, debouncedSearch]);
 
     return (
         <div className="container-subject">
@@ -185,7 +203,19 @@ export default function TeacherSubject() {
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
                         Danh sách môn học
                     </h3>
-
+                    <div>
+                        <div>
+                            <svg style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            <input
+                                type="text"
+                                className="form-input-control"
+                                placeholder="Tìm kiếm theo tên môn học..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                style={{ paddingLeft: '38px', margin: 0 }}
+                            />
+                        </div>
+                    </div>
                     <div className="table-container">
                         <table className="styled-table">
                             <thead>
