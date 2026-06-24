@@ -50,4 +50,11 @@ public class SubjectService {
 
         return subjectRepos.save(existingSubject);
     }
+
+    public void deleteSubject(Integer id) {
+        Subject existingSubject = subjectRepos.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy môn học có ID: " + id));
+
+        subjectRepos.delete(existingSubject);
+    }
 }

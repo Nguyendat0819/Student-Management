@@ -100,7 +100,20 @@ export default function TeacherSubject() {
                 }
             })
     }
-    
+    const deleteSubject = (id) => {
+
+        if (window.confirm("Bạn có chắc chắn muốn xóa môn học này không?")) {
+            axiosClient.delete(`/api/subject/${id}`)
+                .then((response) => {
+                    alert("Xoá môn học thành công");
+                    getSubject();
+                })
+                .catch((error) => {
+                    alert("Lỗi: Không thể xóa môn học. Vui lòng kiểm tra lại.");
+                })
+        }
+    }
+
     useEffect(() => {
         if (error) {
             setTimeout(() => {
@@ -108,7 +121,7 @@ export default function TeacherSubject() {
             }, 3000)
         }
     }, [error]);
-    
+
     useEffect(() => {
         getSubject();
     }, [page]);
@@ -136,30 +149,30 @@ export default function TeacherSubject() {
                         )}
                         <div className="form-group">
                             <label htmlFor="subject_name">Tên môn học</label>
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 id="subject_name"
-                                name="subject_name" 
+                                name="subject_name"
                                 className="form-input-control"
-                                value={data.subject_name} 
-                                onChange={handleChange('add')} 
-                                placeholder="Nhập tên môn học..." 
-                                autoComplete="off" 
-                                required 
+                                value={data.subject_name}
+                                onChange={handleChange('add')}
+                                placeholder="Nhập tên môn học..."
+                                autoComplete="off"
+                                required
                             />
                         </div>
                         <div className="form-group">
                             <label htmlFor="coefficient">Hệ số môn</label>
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 id="coefficient"
-                                name="coefficient" 
+                                name="coefficient"
                                 className="form-input-control"
-                                value={data.coefficient} 
-                                onChange={handleChange('add')} 
-                                placeholder="Nhập hệ số môn..." 
-                                autoComplete="off" 
-                                required 
+                                value={data.coefficient}
+                                onChange={handleChange('add')}
+                                placeholder="Nhập hệ số môn..."
+                                autoComplete="off"
+                                required
                             />
                         </div>
                         <button className="btn-primary" style={{ marginTop: '8px' }} type="submit">Thêm môn học</button>
@@ -172,7 +185,7 @@ export default function TeacherSubject() {
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
                         Danh sách môn học
                     </h3>
-                    
+
                     <div className="table-container">
                         <table className="styled-table">
                             <thead>
@@ -197,6 +210,16 @@ export default function TeacherSubject() {
                                                 }}>
                                                     Chỉnh sửa
                                                 </button>
+                                                <button
+                                                    className="btn-action"
+                                                    style={{ color: '#ef4444', backgroundColor: '#fef2f2', borderColor: '#fecaca' }}
+                                                    onClick={() => {
+                                                        deleteSubject(subject.id);
+                                                    }}
+                                                >
+                                                    Xóa
+                                                </button>
+
                                             </td>
                                         </tr>
                                     ))
@@ -269,7 +292,7 @@ export default function TeacherSubject() {
                             });
                         }}>&times;</button>
                     </div>
-                    
+
                     <form onSubmit={putSubject}>
                         {error && viewUpdate && (
                             <div className="error-alert">
@@ -279,31 +302,31 @@ export default function TeacherSubject() {
                         )}
                         <div className="form-group">
                             <label>Tên môn học</label>
-                            <input 
-                                type="text" 
-                                name="subject_name" 
+                            <input
+                                type="text"
+                                name="subject_name"
                                 className="form-input-control"
-                                value={updateData.subject_name || ''} 
-                                onChange={handleChange('update')} 
-                                placeholder="Nhập tên môn học..." 
-                                autoComplete="off" 
+                                value={updateData.subject_name || ''}
+                                onChange={handleChange('update')}
+                                placeholder="Nhập tên môn học..."
+                                autoComplete="off"
                                 required
                             />
                         </div>
                         <div className="form-group">
                             <label>Hệ số</label>
-                            <input 
-                                type="text" 
-                                name="coefficient" 
+                            <input
+                                type="text"
+                                name="coefficient"
                                 className="form-input-control"
-                                value={updateData.coefficient || ''} 
-                                onChange={handleChange('update')} 
-                                placeholder="Nhập hệ số..." 
-                                autoComplete="off" 
+                                value={updateData.coefficient || ''}
+                                onChange={handleChange('update')}
+                                placeholder="Nhập hệ số..."
+                                autoComplete="off"
                                 required
                             />
                         </div>
-                        
+
                         <div className="modal-actions">
                             <button type="button" className="btn-secondary" onClick={() => {
                                 setViewupdate(false);

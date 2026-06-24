@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -72,6 +73,20 @@ public class SubjectController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Lỗi chi tiết " + e.getMessage() + "(" + e.getClass().getSimpleName() + ")");
+        }
+    }
+
+    @DeleteMapping("/api/subject/{id}")
+    public ResponseEntity<?> deleteSubject(@PathVariable int id) {
+        try {
+            subjectService.deleteSubject(id);
+            return ResponseEntity.ok("Xóa môn học thành công");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Lỗi hệ thống: " + e.getMessage() + " (" + e.getClass().getSimpleName() + ")");
         }
     }
 }
