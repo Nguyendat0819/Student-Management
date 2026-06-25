@@ -30,4 +30,13 @@ public interface SubjectRepository extends JpaRepository<Subject, Integer> {
                         WHERE LOWER(s.subject_name) LIKE(CONCAT('%', :keyword, '%'))
                         """)
         Page<Subject> searchSubject(@Param("keyword") String keyword, Pageable pageable);
+
+        @Query("""
+                        SELECT s
+                        FROM Subject s
+                        WHERE LOWER(s.subject_name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                        AND CAST(s.coefficient AS int) >= :minCoef 
+                        AND CAST(s.coefficient AS int) <= :maxCoef
+                        """)
+        Page<Subject> searchSubjectWithFilter(@Param("keyword") String keyword, @Param("minCoef") Integer minCoef, @Param("maxCoef") Integer maxCoef, Pageable pageable);
 }

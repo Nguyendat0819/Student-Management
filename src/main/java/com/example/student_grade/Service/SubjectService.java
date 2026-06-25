@@ -27,11 +27,11 @@ public class SubjectService {
         System.out.println("Nhap mon thanh cong");
     }
 
-    public Page<Subject> getAllSubject(Pageable pageable, String keyword) {
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            return subjectRepos.searchSubject(keyword.trim(), pageable);
-        }
-        return subjectRepos.findAll(pageable);
+    public Page<Subject> getAllSubject(Pageable pageable, String keyword, Integer minCoef, Integer maxCoef) {
+        String safeKeyword = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : "";
+        int safeMinCoef = (minCoef != null) ? minCoef : 1;
+        int safeMaxCoef = (maxCoef != null) ? maxCoef : 10;
+        return subjectRepos.searchSubjectWithFilter(safeKeyword, safeMinCoef, safeMaxCoef, pageable);
     }
 
     public Subject putSubject(Subject updateData) throws Exception {
@@ -59,5 +59,10 @@ public class SubjectService {
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy môn học có ID: " + id));
 
         subjectRepos.delete(existingSubject);
+    }
+
+    // option
+    public List<Subject> optionSubject() {
+        return subjectRepos.getAllSubject();
     }
 }

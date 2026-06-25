@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axiosClient from "../api/axiosclient";
 import "../assets/teacherSubject.css";
+import { Slider } from "antd";
 
 export default function TeacherSubject() {
     const [error, setError] = useState();
@@ -14,6 +15,9 @@ export default function TeacherSubject() {
     const [viewUpdate, setViewupdate] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
+    const [optionSubjects, setOptionSubject] = useState([]);
+    const [coefficientRange, setCoefficientRange] = useState([1, 10]);
+    const [debouncedCoefficient, setDebouncedCoefficient] = useState([1, 10]);
     const getPagination = (currentPage, totalPages) => {
         if (totalPages <= 5) {
             return Array.from({ length: totalPages }, (_, i) => i);
@@ -81,6 +85,10 @@ export default function TeacherSubject() {
         if (debouncedSearch) {
             params.append('keyword', debouncedSearch);
         }
+        if (debouncedCoefficient) {
+            params.append('minCoef', debouncedCoefficient[0]);
+            params.append('maxCoef', debouncedCoefficient[1]);
+        }
         axiosClient.get(`/api/subject?${params.toString()}`)
             .then((reponse) => {
                 setSubjects(reponse.content || []);
@@ -122,7 +130,20 @@ export default function TeacherSubject() {
                 })
         }
     }
+    // Phần Option 
+    const getOption = (e) => {
+        if (e) e.preventDefault();
+        axiosClient.get('/api/optionSubject')
+            .then((response) => {
+                setOptionSubject(response);
 
+            })
+            .catch((error) => {
+
+            })
+
+    }
+    console.log(optionSubjects);
     useEffect(() => {
         if (error) {
             setTimeout(() => {
@@ -140,9 +161,19 @@ export default function TeacherSubject() {
         }, 500);
         return () => clearTimeout(handler);
     }, [searchTerm]);
+
+    const handleApplyFilter = () => {
+        setDebouncedCoefficient(coefficientRange);
+        setPage(0);
+    };
+
+    useEffect(() => {
+        getOption();
+    }, []);
+
     useEffect(() => {
         getSubject();
-    }, [page, debouncedSearch]);
+    }, [page, debouncedSearch, debouncedCoefficient]);
 
     return (
         <div className="container-subject">
@@ -195,6 +226,54 @@ export default function TeacherSubject() {
                         </div>
                         <button className="btn-primary" style={{ marginTop: '8px' }} type="submit">Thêm môn học</button>
                     </form>
+                    <div style={{ marginTop: '20px' }}>
+                        <h3 style={{ marginBottom: '16px' }}>
+                            Bộ lọc môn học
+                        </h3>
+                        
+                        <div style={{ marginBottom: '16px' }}>
+                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
+                                Lọc theo khoảng hệ số: {coefficientRange[0]} - {coefficientRange[1]}
+                            </label>
+                            <div style={{ padding: '0 10px' }}>
+                                <Slider 
+                                    range 
+                                    min={1} 
+                                    max={10} 
+                                    defaultValue={[1, 10]} 
+                                    value={coefficientRange}
+                                    onChange={(val) => setCoefficientRange(val)}
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
+                                Xem danh sách các môn
+                            </label>
+                            <select className="form-input-control" style={{ width: '100%', marginBottom: '16px' }}>
+                                <option value="">-- Tất cả môn học --</option>
+                                {optionSubjects && optionSubjects.length > 0 ? (
+                                    optionSubjects.map((optionSubject, index) => (
+                                        <option key={index} value={optionSubject.id}>
+                                            {optionSubject.subject_name}
+                                        </option>
+                                    ))
+                                ) : (
+                                    <option disabled>Chưa có môn học</option>
+                                )}
+                            </select>
+                        </div>
+
+                        <button 
+                            type="button" 
+                            className="btn-primary" 
+                            style={{ width: '100%' }}
+                            onClick={handleApplyFilter}
+                        >
+                            Lọc kết quả
+                        </button>
+                    </div>
                 </div>
 
                 {/* Danh Sách Môn Học */}
@@ -205,7 +284,7 @@ export default function TeacherSubject() {
                     </h3>
                     <div>
                         <div>
-                            <svg style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+
                             <input
                                 type="text"
                                 className="form-input-control"

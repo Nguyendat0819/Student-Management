@@ -47,10 +47,12 @@ public class SubjectController {
     public ResponseEntity<?> getAllSubject(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
-            @RequestParam(required = false) String keyword) {
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Integer minCoef,
+            @RequestParam(required = false) Integer maxCoef) {
         try {
             Pageable pageable = PageRequest.of(page, size);
-            Page<Subject> subjectsPage = subjectService.getAllSubject(pageable, keyword);
+            Page<Subject> subjectsPage = subjectService.getAllSubject(pageable, keyword, minCoef, maxCoef);
             return ResponseEntity.ok(subjectsPage);
         } catch (Exception e) {
             e.printStackTrace();
@@ -90,4 +92,19 @@ public class SubjectController {
                     .body("Lỗi hệ thống: " + e.getMessage() + " (" + e.getClass().getSimpleName() + ")");
         }
     }
+
+    // Phan option
+    @GetMapping("/api/optionSubject")
+    public ResponseEntity<?> getOption() {
+        try {
+            List<Subject> subjects = subjectService.optionSubject();
+            // System.out.println("So luong mon hoc lay ra: " + subjects.size());
+            return ResponseEntity.ok(subjects);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Hệ thống đang gặp sự cố, vui lòng thử lại sau!");
+        }
+    }
+
 }
