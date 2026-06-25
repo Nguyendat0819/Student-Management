@@ -8,15 +8,18 @@ import TeacherDashboard from './components/TeacherDashboard';
 import StudentDashboard from './components/StudentDashboard';
 import TeacherGrades from './components/TeacherGrades';
 import TeacherSubject from './components/TeacherSubject';
+import Navbar from './components/Navbar';
+
 function App() {
   return (
     <Router>
+      <Navbar />
       <Routes>
         <Route path="/home" element={<Home />} />
         <Route path="/regist" element={<Register />} />
         <Route path="/login" element={<Login />} />
 
-        {/* trang cho teacher */}
+
         <Route path='teacher-dashboard' element={
 
           <ProtectedRoute requiredRole={'teacher'}>
